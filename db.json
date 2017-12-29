@@ -1,17 +1,26 @@
 {
-  "env1": 
-  {
-    "AWS/RDS":["rds1","rds2"],
-    "AWS/ELB":["elb1"]
+"Region1":  {
+  "env1":
+    {
+      "AWS/RDS":["rds1","rds2"],
+      "AWS/ELB":["elb1"]
+    },
+    "env2":
+    {
+      "AWS/RDS":["srds1"],
+      "AWS/ELB":["elb1"]
+    },
+    "env3":
+    {
+      "AWS/RDS":["prds1","prds2"],
+      "AWS/ELB":["pelb1","pelb2"]
+    }
   },
-  "env2": 
-  {
-    "AWS/RDS":["srds1"],
-    "AWS/ELB":["elb1"]
-  },
-  "env3": 
-  {
-    "AWS/RDS":["prds1","prds2"],
-    "AWS/ELB":["pelb1","pelb2"]
+"Region2": {
+  "env1":
+    {
+      "AWS/RDS":["rds1","rds2"],
+      "AWS/ELB":["elb1"]
+    }
   }
 }
