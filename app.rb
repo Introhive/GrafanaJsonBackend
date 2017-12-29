@@ -16,9 +16,9 @@ class GrafanaJsonApp < Sinatra::Base
     target = JSON.parse(request.body.read)
     search = JSON.parse(target['target'])
     if search['environment'] == 'list'
-      return json_hash.keys.to_json
-    elsif json_hash.keys.include?(search['environment'])
-      return json_hash[search['environment']][search['namespace']].to_json if search['namespace'] != nil
+      return json_hash[search['region']].keys.to_json if json_hash.include?(search['region'])
+    elsif json_hash.include?(search['region']) and json_hash[search['region']].keys.include?(search['environment'])
+      return json_hash[search['region']][search['environment']][search['namespace']].to_json if search['namespace'] != nil
     end
   end
 
