@@ -14,27 +14,27 @@ class MyAppTest < Minitest::Test
     assert_equal 'Introhive AWS Resource JSON', last_response.body
   end
 
-  def test_search_environment_region1
+  def test_search_environment_list
     data = {
-            'target' => '{"environment":"list", "region":"Region1"}'
+            'target' => '{"return":"environment_list"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
-    assert_equal "[\"env1\",\"env2\",\"env3\"]", last_response.body
+    assert_equal "[\"env1\",\"env2\",\"env3\",\"env1\"]", last_response.body
   end
 
-  def test_search_environment_region2
+  def test_search_environment_region1
     data = {
-            'target' => '{"environment":"list", "region":"Region2"}'
+            'target' => '{"environment":"env2", "return":"region"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
-    assert_equal "[\"env1\"]", last_response.body
+    assert_equal "[\"Region1\"]", last_response.body
   end
 
   def test_search_namespace1
     data = {
-            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "region":"Region1"}'
+            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "region":"Region1", "return":"namespace"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -43,7 +43,7 @@ class MyAppTest < Minitest::Test
 
   def test_search_namespace2
     data = {
-            'target' => '{"environment":"env1", "namespace":"AWS/RDS", "region":"Region1"}'
+            'target' => '{"environment":"env1", "namespace":"AWS/RDS", "region":"Region1", "return":"namespace"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
