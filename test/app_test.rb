@@ -23,6 +23,15 @@ class MyAppTest < Minitest::Test
     assert_equal "[\"env1\",\"env2\",\"env3\",\"env1\"]", last_response.body
   end
 
+  def test_search_region_list
+    data = {
+            'target' => '{"return":"region_list", "environment":"(env1|env2)"}'
+        }
+    post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert_equal "[\"Region1\",\"Region2\"]", last_response.body
+  end
+
   def test_search_environment_region1
     data = {
             'target' => '{"environment":"env2", "return":"region"}'
