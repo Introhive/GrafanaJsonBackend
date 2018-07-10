@@ -17,10 +17,10 @@
     }
   },
 "Region2": {
-  "env1":
+  "env4":
     {
-      "AWS/RDS":["rds1","rds2"],
-      "AWS/ELB":["elb1"]
+      "AWS/RDS":["rds4"],
+      "AWS/ELB":["elb4"]
     }
   }
 }

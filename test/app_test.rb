@@ -20,12 +20,12 @@ class MyAppTest < Minitest::Test
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
-    assert_equal "[\"env1\",\"env2\",\"env3\",\"env1\"]", last_response.body
+    assert_equal "[\"env1\",\"env2\",\"env3\",\"env4\"]", last_response.body
   end
 
   def test_search_region_list
     data = {
-            'target' => '{"return":"region_list", "environment":"(env1|env2)"}'
+            'target' => '{"return":"region", "environment":"(env1|env4)"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -43,7 +43,7 @@ class MyAppTest < Minitest::Test
 
   def test_search_namespace1
     data = {
-            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "region":"Region1", "return":"namespace"}'
+            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "return":"namespace"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -52,10 +52,48 @@ class MyAppTest < Minitest::Test
 
   def test_search_namespace2
     data = {
-            'target' => '{"environment":"env1", "namespace":"AWS/RDS", "region":"Region1", "return":"namespace"}'
+            'target' => '{"environment":"env1", "namespace":"AWS/RDS", "return":"namespace"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
     assert_equal "[\"rds1\",\"rds2\"]", last_response.body
   end
+
+  def test_search_namespace_list
+    data = {
+            'target' => '{"environment":"(env1|env2|env4)", "namespace":"AWS/RDS", "return":"namespace"}'
+        }
+    post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert_equal "[\"rds1\",\"rds2\",\"srds1\",\"rds4\"]", last_response.body
+  end
+
+  # Does not throw error on Invalid params
+  def test_search_invalid_env_namespace
+    data = {
+            'target' => '{"environment":"env_not_exist", "namespace":"AWS/RDS", "return":"namespace"}'
+        }
+    post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert_equal "[]", last_response.body
+  end
+
+  def test_search_invalid_env_region
+    data = {
+            'target' => '{"environment":"env_not_exist", "return":"region"}'
+        }
+    post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert_equal "[]", last_response.body
+  end
+
+  def test_search_invalid_namespace
+    data = {
+            'target' => '{"environment":"env1", "namespace":"Invalid", "return":"namespace"}'
+        }
+    post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert_equal "[]", last_response.body
+  end
+
 end
