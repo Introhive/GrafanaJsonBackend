@@ -20,9 +20,6 @@ class GrafanaJsonApp < Sinatra::Base
     when 'environment_list'
       return json_hash.collect {|reg, envs| envs.keys }.flatten.to_json
     when 'region'
-      result = json_hash.select { |reg, envs| envs[search['environment']] }.keys
-      return result.to_json if result
-    when 'region_list'
       env_list = search['environment'].gsub(/^[(]|[)]$/, "").split('|')
       reg_list = []
       env_list.each do |env|
@@ -30,9 +27,12 @@ class GrafanaJsonApp < Sinatra::Base
       end
       return reg_list.uniq.to_json
     when 'namespace'
-      if json_hash.include?(search['region']) and json_hash[search['region']].keys.include?(search['environment'])
-        return json_hash[search['region']][search['environment']][search['namespace']].to_json if search['namespace'] != nil
+      env_list = search['environment'].gsub(/^[(]|[)]$/, "").split('|')
+      namespace_list = []
+      env_list.each do |env|
+        namespace_list += json_hash.collect { |reg, envs| envs[env][search['namespace']] if envs[env] && envs[env].keys.include?(search['namespace']) }
       end
+      return namespace_list.flatten.compact.uniq.to_json
     end
   end
 
