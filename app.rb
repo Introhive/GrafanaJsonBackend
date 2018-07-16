@@ -5,17 +5,9 @@ class GrafanaJsonApp < Sinatra::Base
     enable :logging
   end
   
-  json_hash = JSON.load(File.read('./db.json'))
 
-  get '/' do
-    'Introhive AWS Resource JSON'
-  end
-
-  post '/search' do
-    content_type :json
-    target = JSON.parse(request.body.read)
-    search = JSON.parse(target['target'])
-
+  def search_results(search)
+    json_hash = JSON.load(File.read('./db.json'))
     case search['return']
     when 'environment_list'
       return json_hash.collect {|reg, envs| envs.keys }.flatten.to_json
@@ -34,6 +26,21 @@ class GrafanaJsonApp < Sinatra::Base
       end
       return namespace_list.flatten.compact.uniq.to_json
     end
+  end
+
+  get '/' do
+    'Introhive AWS Resource JSON'
+  end
+
+  post '/search' do
+    content_type :json
+    target = JSON.parse(request.body.read)
+    search = JSON.parse(target['target'])
+    return self.search_results(search)
+  end
+
+  post '/dashboard_api' do
+    return search_results(params)
   end
 
 run! if __FILE__ == $0
