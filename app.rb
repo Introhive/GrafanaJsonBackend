@@ -43,5 +43,21 @@ class GrafanaJsonApp < Sinatra::Base
     return search_results(params)
   end
 
+  # For cloudwatch metrics list
+  post '/cloudwatch_metrics_list_api' do
+    json_hash = JSON.load(File.read('./cloudwatch_metrics_list.json'))
+    namespace_list = json_hash[params['region']] if params['region']
+    resource_list = namespace_list[params['namespace']] if params['namespace']
+    metrics_list = resource_list[params['resource']] if params['resource']
+    metrics_list = [] unless metrics_list
+    case params['return']
+    when 'list'
+      return metrics_list.to_json
+    when 'exist_status'
+      result = metrics_list.include? params['metric']
+      return {'status'=>result}.to_json
+    end
+  end
+
 run! if __FILE__ == $0
 end
