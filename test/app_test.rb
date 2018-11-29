@@ -162,4 +162,48 @@ class MyAppTest < Minitest::Test
     assert_equal "[]", last_response.body
   end
 
+  # Test cloudwatch metrics list
+
+  def test_api_cloudwatch_metrics_list1
+    data = {"return": "list", "region": "reg1", "namespace": "AWS/RDS", "resource": "rds1"}
+    post '/cloudwatch_metrics_list_api', data
+    assert last_response.ok?
+    assert_equal "[\"m1\",\"m2\",\"m3\"]", last_response.body
+  end
+
+  def test_api_cloudwatch_metrics_list2
+    data = {"return": "list", "region": "reg2", "namespace": "AWS/RDS", "resource": "rds4"}
+    post '/cloudwatch_metrics_list_api', data
+    assert last_response.ok?
+    assert_equal "[\"m1\"]", last_response.body
+  end
+
+  def test_api_cloudwatch_metrics_exist1
+    data = {"return": "exist_status", "region": "reg1", "namespace": "AWS/RDS", "resource": "rds1", "metric": "m1"}
+    post '/cloudwatch_metrics_list_api', data
+    assert last_response.ok?
+    assert_equal "{\"status\":true}", last_response.body
+  end
+
+  def test_api_cloudwatch_metrics_exist2
+    data = {"return": "exist_status", "region": "reg2", "namespace": "AWS/RDS", "resource": "rds4", "metric": "m10"}
+    post '/cloudwatch_metrics_list_api', data
+    assert last_response.ok?
+    assert_equal "{\"status\":false}", last_response.body
+  end
+
+  def test_api_cloudwatch_metrics_list_invalid
+    data = {"return": "list", "region": "reg2", "namespace": "AWS/RDS", "resource": "rds10"}
+    post '/cloudwatch_metrics_list_api', data
+    assert last_response.ok?
+    assert_equal "[]", last_response.body
+  end
+
+  def test_api_cloudwatch_metrics_exist_invalid
+    data = {"return": "exist_status", "region": "reg2", "namespace": "AWS/RDS", "resource": "rds4"}
+    post '/cloudwatch_metrics_list_api', data
+    assert last_response.ok?
+    assert_equal "{\"status\":false}", last_response.body
+  end
+
 end
