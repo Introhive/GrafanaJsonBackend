@@ -5,17 +5,9 @@ class GrafanaJsonApp < Sinatra::Base
     enable :logging
   end
   
-  json_hash = JSON.load(File.read('./db.json'))
 
-  get '/' do
-    'Introhive AWS Resource JSON'
-  end
-
-  post '/search' do
-    content_type :json
-    target = JSON.parse(request.body.read)
-    search = JSON.parse(target['target'])
-
+  def search_results(search)
+    json_hash = JSON.load(File.read('./db.json'))
     case search['return']
     when 'environment_list'
       return json_hash.collect {|reg, envs| envs.keys }.flatten.to_json
@@ -33,6 +25,37 @@ class GrafanaJsonApp < Sinatra::Base
         namespace_list += json_hash.collect { |reg, envs| envs[env][search['namespace']] if envs[env] && envs[env].keys.include?(search['namespace']) }
       end
       return namespace_list.flatten.compact.uniq.to_json
+    end
+  end
+
+  get '/' do
+    'Introhive AWS Resource JSON'
+  end
+
+  post '/search' do
+    content_type :json
+    target = JSON.parse(request.body.read)
+    search = JSON.parse(target['target'])
+    return self.search_results(search)
+  end
+
+  post '/dashboard_api' do
+    return search_results(params)
+  end
+
+  # For cloudwatch metrics list
+  post '/cloudwatch_metrics_list_api' do
+    json_hash = JSON.load(File.read('./cloudwatch_metrics_list.json'))
+    namespace_list = json_hash[params['region']] if params['region']
+    resource_list = namespace_list[params['namespace']] if params['namespace']
+    metrics_list = resource_list[params['resource']] if params['resource']
+    metrics_list = [] unless metrics_list
+    case params['return']
+    when 'list'
+      return metrics_list.to_json
+    when 'exist_status'
+      result = metrics_list.include? params['metric']
+      return {'status'=>result}.to_json
     end
   end
 
