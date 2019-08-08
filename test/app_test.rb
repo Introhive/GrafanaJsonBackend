@@ -43,16 +43,25 @@ class MyAppTest < Minitest::Test
 
   def test_search_namespace1
     data = {
-            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "return":"namespace"}'
+            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "return":"resource"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
-    assert_equal "[\"elb1\"]", last_response.body
+    assert_equal "[{\"loadbalancer\":\"ELB1\",\"targetgroup\":\"TG1\"},{\"loadbalancer\":\"ELB2\",\"targetgroup\":\"TG2\"}]", last_response.body
+  end
+
+  def test_search_namespace1_with_attributes
+    data = {
+            'target' => '{"environment":"env1", "namespace":"AWS/ELB", "return":"resource", "attribute": "loadbalancer"}'
+        }
+    post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
+    assert last_response.ok?
+    assert_equal "[\"ELB1\",\"ELB2\"]", last_response.body
   end
 
   def test_search_namespace2
     data = {
-            'target' => '{"environment":"env1", "namespace":"AWS/RDS", "return":"namespace"}'
+            'target' => '{"environment":"env1", "namespace":"AWS/RDS", "return":"resource"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -61,7 +70,7 @@ class MyAppTest < Minitest::Test
 
   def test_search_namespace_list
     data = {
-            'target' => '{"environment":"(env1|env2|env4)", "namespace":"AWS/RDS", "return":"namespace"}'
+            'target' => '{"environment":"(env1|env2|env4)", "namespace":"AWS/RDS", "return":"resource"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -71,7 +80,7 @@ class MyAppTest < Minitest::Test
   # Does not throw error on Invalid params
   def test_search_invalid_env_namespace
     data = {
-            'target' => '{"environment":"env_not_exist", "namespace":"AWS/RDS", "return":"namespace"}'
+            'target' => '{"environment":"env_not_exist", "namespace":"AWS/RDS", "return":"resource"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -89,7 +98,7 @@ class MyAppTest < Minitest::Test
 
   def test_search_invalid_namespace
     data = {
-            'target' => '{"environment":"env1", "namespace":"Invalid", "return":"namespace"}'
+            'target' => '{"environment":"env1", "namespace":"Invalid", "return":"resource"}'
         }
     post '/search', data.to_json, "CONTENT_TYPE" => "application/json"
     assert last_response.ok?
@@ -120,21 +129,28 @@ class MyAppTest < Minitest::Test
   end
 
   def test_api_search_namespace1
-    data = {"environment":"env1", "namespace":"AWS/ELB", "return":"namespace"}
+    data = {"environment":"env1", "namespace":"AWS/ELB", "return":"resource"}
     post '/dashboard_api', data
     assert last_response.ok?
-    assert_equal "[\"elb1\"]", last_response.body
+    assert_equal "[{\"loadbalancer\":\"ELB1\",\"targetgroup\":\"TG1\"},{\"loadbalancer\":\"ELB2\",\"targetgroup\":\"TG2\"}]", last_response.body
+  end
+
+  def test_api_search_namespace1_with_attribute
+    data = {"environment":"env1", "namespace":"AWS/ELB", "return":"resource", "attribute": "targetgroup"}
+    post '/dashboard_api', data
+    assert last_response.ok?
+    assert_equal "[\"TG1\",\"TG2\"]", last_response.body
   end
 
   def test_api_search_namespace2
-    data = {"environment":"env1", "namespace":"AWS/RDS", "return":"namespace"}
+    data = {"environment":"env1", "namespace":"AWS/RDS", "return":"resource"}
     post '/dashboard_api', data
     assert last_response.ok?
     assert_equal "[\"rds1\",\"rds2\"]", last_response.body
   end
 
   def test_api_search_namespace_list
-    data = {"environment":"(env1|env2|env4)", "namespace":"AWS/RDS", "return":"namespace"}
+    data = {"environment":"(env1|env2|env4)", "namespace":"AWS/RDS", "return":"resource"}
     post '/dashboard_api', data
     assert last_response.ok?
     assert_equal "[\"rds1\",\"rds2\",\"srds1\",\"rds4\"]", last_response.body
@@ -142,7 +158,7 @@ class MyAppTest < Minitest::Test
 
   # Does not throw error on Invalid params
   def test_api_search_invalid_env_namespace
-    data = {"environment":"env_not_exist", "namespace":"AWS/RDS", "return":"namespace"}
+    data = {"environment":"env_not_exist", "namespace":"AWS/RDS", "return":"resource"}
     post '/dashboard_api', data
     assert last_response.ok?
     assert_equal "[]", last_response.body
@@ -156,7 +172,7 @@ class MyAppTest < Minitest::Test
   end
 
   def test_api_search_invalid_namespace
-    data = {"environment":"env1", "namespace":"Invalid", "return":"namespace"}
+    data = {"environment":"env1", "namespace":"Invalid", "return":"resource"}
     post '/dashboard_api', data
     assert last_response.ok?
     assert_equal "[]", last_response.body

@@ -3,12 +3,12 @@
   "env1":
     {
       "AWS/RDS":["rds1","rds2"],
-      "AWS/ELB":["elb1"]
+      "AWS/ELB":[{"loadbalancer": "ELB1", "targetgroup": "TG1"}, {"loadbalancer": "ELB2", "targetgroup": "TG2"}]
     },
     "env2":
     {
       "AWS/RDS":["srds1"],
-      "AWS/ELB":["elb1"]
+      "AWS/ELB":[{"loadbalancer": "ELB3", "targetgroup": "TG3"}, {"loadbalancer": "ELB4", "targetgroup": "TG4"}]
     },
     "env3":
     {
@@ -20,7 +20,7 @@
   "env4":
     {
       "AWS/RDS":["rds4"],
-      "AWS/ELB":["elb4"]
+      "AWS/ELB":[{"loadbalancer": "ELB5", "targetgroup": "TG5"}]
     }
   }
 }
