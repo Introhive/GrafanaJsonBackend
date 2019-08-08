@@ -18,7 +18,7 @@ class GrafanaJsonApp < Sinatra::Base
         reg_list += json_hash.select { |reg, envs| envs[env] }.keys
       end
       return reg_list.uniq.to_json
-    when 'namespace'
+    when 'resource'
       env_list = search['environment'].gsub(/^[(]|[)]$/, "").split('|')
       namespace_list = []
       env_list.each do |env|
