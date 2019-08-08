@@ -22,7 +22,11 @@ class GrafanaJsonApp < Sinatra::Base
       env_list = search['environment'].gsub(/^[(]|[)]$/, "").split('|')
       namespace_list = []
       env_list.each do |env|
-        namespace_list += json_hash.collect { |reg, envs| envs[env][search['namespace']] if envs[env] && envs[env].keys.include?(search['namespace']) }
+        namespace_list += json_hash.collect do |reg, envs|
+          resource = envs[env] && envs[env].keys.include?(search['namespace']) ? envs[env][search['namespace']] : []
+          resource = resource.collect { |metadata| metadata.is_a?(Hash) ? metadata[search['attribute']] : metadata } if search['attribute']
+          resource
+        end
       end
       return namespace_list.flatten.compact.uniq.to_json
     end
